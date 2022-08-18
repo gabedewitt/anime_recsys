@@ -1,6 +1,6 @@
 # WebApp de recomendação de anime
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_red.svg)](https://gabedewitt-webapp-deploy-new-app-n93vy4.streamlitapp.com/)
+![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_red.svg)
 ![Python](https://img.shields.io/badge/Python-black?style=flat-square&logo=Python&logoColor=blue)
 ![Kaggle](https://img.shields.io/badge/Kaggle-black?style=flat-square&logo=kaggle&logoColor=blue)
 
