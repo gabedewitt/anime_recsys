@@ -3,16 +3,12 @@ import matplotlib.pyplot as plt
 import streamlit as st
 from streamlit.logger import get_logger
 
+st.set_page_config(page_title="Home", page_icon="👋") 
 LOGGER = get_logger(__name__)
 
 
 def run():
-    st.set_page_config(
-        page_title="Hello",
-        page_icon="👋",
-    )
-
-    st.write("# Welcome to the Anime sugestion app! 👋")
+    st.write("# Welcome to this Anime sugestion app! 👋")
 
     st.sidebar.success("Select an option above.")
 
@@ -24,6 +20,8 @@ def run():
         This means that sadly One Piece and Case Closed won't be recommended by this app,
         but both are definitely worth the reading if the prospect of 1000+ episodes feels
         too long for you.
+
+        The nature of the dataset allowed for a the  
         """
     )
 
