@@ -4,6 +4,8 @@ from skimage import io
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import itertools
+from ast import literal_eval
+
 def show_Cover(url):
     a = io.imread(url)
     plt.imshow(a)
@@ -20,6 +22,15 @@ def make_cloud(data, column):
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
     plt.show()
+
+def preprocess(df, column_list):    
+    for column in column_list:
+        string = column + '_treated'
+        df_hold = df.loc[:,column]
+        df_hold = df_hold.apply(lambda x: literal_eval(x) if len(x) > 2 else [])
+        df[string] = df_hold
+        df.drop(column, axis = 1, inplace = True)
+        return df
 
 def data_frame_demo():
     @st.experimental_memo
@@ -41,9 +52,7 @@ def data_frame_demo():
     list_columns = ['genres','themes','demographics','studios'
                ,'producers','licensors']
 
-    for column in list_columns:
-        df_pred[column] = df_pred[column].str.replace("['']","")
-        df_pred[column] = df_pred[column].str.replace("\[\]","")
+    df_pred = preprocess(df_pred, list_columns)
         
     anime_list = st.multiselect(
          "Choose some anime", list(df.title)
