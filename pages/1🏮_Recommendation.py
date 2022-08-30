@@ -30,9 +30,9 @@ def gen_wordcloud(df, column_name):
     list_wc = list(itertools.chain(*list_wc))
     strings = ' '.join(list_wc)
 
-    plt.figure(figsize=(20,10))
-    wordcloud = WordCloud(max_words=100,background_color="white",width=800, height=400).generate(strings)
-    fig, ax = plt.subplots(figsize = (12, 8))
+    plt.figure(figsize=(10,10))
+    wordcloud = WordCloud(max_words=100,background_color="white",width=800, height=400, min_font_size = 10).generate(strings)
+    fig, ax = plt.subplots(figsize = (10, 10))
     ax.imshow(wordcloud)
     plt.axis("off")
     plt.tight_layout(pad=0)
@@ -103,17 +103,22 @@ def data_frame_demo():
         ('sigmoid', 'linear'))
         rec_num = st.slider('How many recommendations?', 10, 50, 20)
         for anime, picture in zip(anime_list,df_subset.main_picture):
-            st.write(f'Anime selected: {anime}')
-            #st.dataframe(df_subset) used for testing
-            st.image(picture, caption = picture)
-            rec_list = get_rec(anime, df_pred, rec_num, r_type)
-            st.dataframe(rec_list)
-            rec_df = df_pred[df_pred["title"].isin(rec_list)]
-            gen_wordcloud(rec_df,'genres_treated')  
+            col1, col2, col3 = st.columns([2,4,4])
+            with col1:
+                st.write(f'Anime selected: {anime}')
+                #st.dataframe(df_subset) used for testing
+                st.image(picture, caption = picture)
+            with col2:    
+                rec_list = get_rec(anime, df_pred, rec_num, r_type)
+                st.dataframe(rec_list, height=550, width= 800)
+            with col3:
+                rec_df = df_pred[df_pred["title"].isin(rec_list)]
+                gen_wordcloud(rec_df,'genres_treated') 
+                gen_wordcloud(rec_df,'themes_treated') 
          
             
 st.set_option('deprecation.showPyplotGlobalUse', False)
-st.set_page_config(page_title="Recommendation", page_icon="🏮") 
+st.set_page_config(page_title="Recommendation", page_icon="🏮", layout="wide") 
 st.markdown("# Anime Suggestion")
 st.sidebar.header("Anime Suggestion")
 st.write(
