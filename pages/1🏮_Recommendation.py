@@ -4,19 +4,22 @@ from skimage import io
 import matplotlib.pyplot as plt
 from wordcloud import WordCloud
 import itertools
+import scipy
+import numpy as np
+import validators
 from ast import literal_eval
 from sklearn.metrics.pairwise import sigmoid_kernel
 from sklearn.metrics.pairwise import linear_kernel
 from sklearn.feature_extraction.text import TfidfVectorizer
 
-def show_Cover(url):
+def show_Cover(url: str) -> None:
     a = io.imread(url)
     plt.imshow(a)
     plt.axis('off')
     plt.show()
 
 @st.experimental_memo
-def preprocess_lists(df, column_list):    
+def preprocess_lists(df: pd.DataFrame, column_list: list) -> pd.DataFrame:    
     for column in column_list:
         string = column + '_treated'
         df_hold = df.loc[:,column]
@@ -25,7 +28,7 @@ def preprocess_lists(df, column_list):
         df.drop(column, axis = 1, inplace = True)
     return df
 
-def gen_wordcloud(df, column_name):
+def gen_wordcloud(df: pd.DataFrame, column_name: str) -> None:
     list_wc = df[column_name].tolist()
     list_wc = list(itertools.chain(*list_wc))
     strings = ' '.join(list_wc)
@@ -39,14 +42,14 @@ def gen_wordcloud(df, column_name):
     st.pyplot(fig) 
 
 @st.cache    
-def vect_Tfid(series):
+def vect_Tfid(series: pd.Series) -> scipy.sparse.csr.csr_matrix:
     tfv = TfidfVectorizer(min_df=3,  max_features=None,
                       analyzer='word',
                       ngram_range=(1, 3),
                       stop_words = 'english')
     return tfv.fit_transform(series)
 
-def sim_score(df, kernel = 'sigmoid'):
+def sim_score(df: pd.DataFrame, kernel: str = 'sigmoid') -> np.ndarray:
     tfv_matrix = vect_Tfid(df['synopsis'])
     if kernel == 'sigmoid':
         return sigmoid_kernel(tfv_matrix, tfv_matrix)
@@ -55,7 +58,7 @@ def sim_score(df, kernel = 'sigmoid'):
 
 
 @st.experimental_memo(persist = 'disk')
-def get_rec(entry, df, sug_num, rec_type):
+def get_rec(entry: str, df: pd.DataFrame, sug_num: int, rec_type: str) -> pd.DataFrame:
     idx = pd.Series(df.index, index=df['title']).drop_duplicates()[entry]
 
     df_sim = list(enumerate(sim_score(df, rec_type)[idx]))
@@ -68,14 +71,14 @@ def get_rec(entry, df, sug_num, rec_type):
 
     return df['title'].iloc[anime_indices]
 
-def data_frame_demo():
+def data_frame_demo() -> None:
     @st.experimental_memo
-    def get_Anime_data():
+    def get_Anime_data() -> None:
         df = pd.read_csv('./myanimelist/anime.csv')
         return df
 
     @st.experimental_memo
-    def preprocess(dataframe):
+    def preprocess(dataframe: pd.DataFrame) -> pd.DataFrame:
         columns = ['title', 'type', 'score', 'scored_by', 'status', 'episodes', 'members',
            'favorites', 'rating', 'sfw', 'genres', 'themes', 'demographics',
            'studios', 'producers', 'licensors','synopsis']
@@ -102,17 +105,21 @@ def data_frame_demo():
         r_type = st.selectbox('Which kernel to be used for the recommendation?',
         ('sigmoid', 'linear'))
         rec_num = st.slider('How many recommendations?', 10, 50, 20)
-        for anime, picture in zip(anime_list,df_subset.main_picture):
+        for anime, picture, url, trailer in zip(anime_list, df_subset.main_picture, df_subset.url, df_subset.trailer_url):
             col1, col2, col3 = st.columns([2,4,4])
             with col1:
                 st.write(f'Anime selected: {anime}')
                 #st.dataframe(df_subset) used for testing
                 st.image(picture, caption = picture)
+                st.write(f'[MAL page]({url})')
+                if validators.url(trailer):
+                    st.video(trailer)
             with col2:    
                 rec_list = get_rec(anime, df_pred, rec_num, r_type)
-                st.dataframe(rec_list, height=550, width= 800)
-            with col3:
                 rec_df = df_pred[df_pred["title"].isin(rec_list)]
+                st.dataframe(rec_df[['title','licensors_treated','sfw']], 
+                height=550, width= 810)
+            with col3:
                 gen_wordcloud(rec_df,'genres_treated') 
                 gen_wordcloud(rec_df,'themes_treated') 
          
