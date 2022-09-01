@@ -42,7 +42,7 @@ def gen_wordcloud(df: pd.DataFrame, column_name: str) -> None:
     st.pyplot(fig) 
 
 @st.cache    
-def vect_Tfid(series: pd.Series) -> scipy.sparse.csr.csr_matrix:
+def vect_Tfid(series: pd.Series) -> scipy.sparse.csr_matrix:
     tfv = TfidfVectorizer(min_df=3,  max_features=None,
                       analyzer='word',
                       ngram_range=(1, 3),
