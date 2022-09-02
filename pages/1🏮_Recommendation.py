@@ -104,7 +104,7 @@ def data_frame_demo() -> None:
         df_subset = df[df["title"].isin(anime_list)]
         r_type = st.selectbox('Which kernel to be used for the recommendation?',
         ('sigmoid', 'linear'))
-        rec_num = st.slider('How many recommendations?', 10, 50, 20)
+        rec_num = st.slider('How many recommendations?', 10, 50, 20) + 1
         for anime, picture, url, trailer in zip(anime_list, df_subset.main_picture, df_subset.url, df_subset.trailer_url):
             col1, col2, col3 = st.columns([2,4,4])
             with col1:
