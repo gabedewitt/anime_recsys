@@ -57,7 +57,7 @@ def sim_score(df: pd.DataFrame, kernel: str = 'sigmoid') -> np.ndarray:
         return linear_kernel(tfv_matrix, tfv_matrix) 
 
 
-@st.experimental_memo(persist = 'disk')
+@st.cache
 def get_rec(entry: str, df: pd.DataFrame, sug_num: int, rec_type: str) -> pd.DataFrame:
     idx = pd.Series(df.index, index=df['title']).drop_duplicates()[entry]
 
