@@ -102,6 +102,7 @@ def data_frame_demo() -> None:
         st.error("Please select an anime.")
     else:
         df_subset = df[df["title"].isin(anime_list)]
+        df_subset.fillna(value = 'Not Found in MAL', inplace=True)
         r_type = st.selectbox('Which kernel to be used for the recommendation?',
         ('sigmoid', 'linear'))
         rec_num = st.slider('How many recommendations?', 10, 50, 20) + 1
